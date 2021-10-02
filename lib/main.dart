@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_json_api/api.dart';
+import 'package:flutter_json_api/comment_model.dart';
+import 'package:flutter_json_api/post_model.dart';
+import 'package:flutter_json_api/user_model.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,105 +13,256 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Demo of JsonPlaceholder',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView(
+        children: [
+          SizedBox(
+            height: 500,
+            child: Container(
+              color: Colors.black,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                    width: 300,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "About",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                            "Aim of this project is to help me and others learn how Api and Json Serialization works in flutter!!!",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            )),
+                        Text(
+                            "This is website uses all the api's provided in JsonPlaceholder.com ",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ))
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Resources",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold)),
+                      Text(
+                          "JSONPlaceholder comes with a set of 6 common resources: \n/posts 100 posts \n/comments 500 comments\n/albums 100 albums\n/photos 5000 photos\n/todos 200 todos\n/users 10 users",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          )),
+                      Text("\nRoutes",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold)),
+                      Text(
+                          "All HTTP methods are supported. You can use http or https for your requests.\nGET /posts\nGET /posts/1\nGET /posts/1/comments\nGET /comments?postId=1\nPOST /posts\nPUT /posts/1\nPATCH /posts/1\nDELETE /posts/1",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ))
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+          MainBody()
+        ],
+      ),
+    );
+  }
+}
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+enum mainBodyState {
+  user,
+
+  posts,
+  comments,
+}
+
+class MainBody extends StatefulWidget {
+  const MainBody({Key key}) : super(key: key);
+
+  @override
+  _MainBodyState createState() => _MainBodyState();
+}
+
+class _MainBodyState extends State<MainBody> {
+  String title = "Users";
+  String name = "";
+  int id = 0;
+  int pid = 0;
+  mainBodyState state = mainBodyState.user;
+
+  Future myFuture() {
+    if (state == mainBodyState.user) return fetchUser();
+    if (state == mainBodyState.posts) return fetchPosts(id);
+    if (state == mainBodyState.comments) return fetchComments(pid);
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 500,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                (state != mainBodyState.user)
+                    ? IconButton(
+                        icon: Icon(Icons.arrow_back_sharp),
+                        onPressed: () {
+                          setState(() {
+                            if (state == mainBodyState.comments) {
+                              state = mainBodyState.posts;
+                              title = name + "'s posts";
+                            } else {
+                              state = mainBodyState.user;
+                              title = "Users";
+                            }
+                          });
+                        })
+                    : Container(),
+                Text(title),
+                IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      if (state == mainBodyState.posts)
+                        createPost(Post(
+                            userId: id,
+                            title: "my first post",
+                            body: "heyaaaaa"));
+
+                      if (state == mainBodyState.user)
+                        createUser(User(
+                            name: "suryakant",
+                            email: "s@gmail.com",
+                            username: "suryakantt"));
+                      if (state == mainBodyState.comments)
+                        createComment(Comment(
+                            body: "lormklnjhjkjkjkjhk",
+                            email: "s@gmail.com",
+                            name: "suryakantt",
+                            postId: pid));
+                    })
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+          ),
+          FutureBuilder(
+            future: myFuture(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return SizedBox(
+                  width: 500,
+                  height: 300,
+                  child: ListView.separated(
+                      itemBuilder: (context, value) {
+                        if (state == mainBodyState.comments)
+                          return ListTile(
+                            title: Text(snapshot.data[value].email),
+                            subtitle: Text(snapshot.data[value].body),
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                deleteComment(snapshot.data[value].id);
+                              },
+                            ),
+                          );
+
+                        if (state == mainBodyState.posts)
+                          return ListTile(
+                            title: Text(snapshot.data[value].title),
+                            subtitle: Text(
+                                snapshot.data[value].body + "\nBy " + name),
+                            onTap: () {
+                              setState(() {
+                                pid = snapshot.data[value].id;
+                                title = "Comments";
+                                state = mainBodyState.comments;
+                              });
+                            },
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                deletePost(snapshot.data[value].id);
+                              },
+                            ),
+                          );
+
+                        return ListTile(
+                          title: Text(snapshot.data[value].name),
+                          subtitle: Text(snapshot.data[value].username +
+                              "\n" +
+                              snapshot.data[value].email),
+                          onTap: () {
+                            setState(() {
+                              name = snapshot.data[value].name;
+                              id = snapshot.data[value].id;
+                              title = name + "'s Posts";
+                              state = mainBodyState.posts;
+                            });
+                          },
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              deleteUser(snapshot.data[value].id);
+                            },
+                          ),
+                        );
+                      },
+                      itemCount: snapshot.data.length,
+                      separatorBuilder: (context, value) {
+                        return Divider();
+                      }),
+                );
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+              return SizedBox(
+                  width: 50, height: 50, child: CircularProgressIndicator());
+            },
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
